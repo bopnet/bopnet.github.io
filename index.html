@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>MusicChain — peer-to-peer music, paid per play</title>
+<meta name="description" content="A peer-to-peer music network where the listeners are the infrastructure, content is verified by acoustic fingerprint, and every play settles on a purpose-built blockchain.">
+<style>
+:root{
+  --ink:#10161b;--muted:#5b6670;--line:#e2e6ea;--bg:#ffffff;
+  --accent:#15b07e;--accent-d:#0a7d5a;--dark:#0c1418;--dark2:#11212a;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);
+  font:16px/1.6 -apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:var(--accent-d);text-decoration:none}
+a:hover{text-decoration:underline}
+.mono{font-family:"Cascadia Mono",Consolas,"SFMono-Regular",Menlo,monospace}
+
+/* hero */
+.hero{background:radial-gradient(1200px 500px at 70% -10%,#16323b 0%,var(--dark) 55%);
+  color:#eef3f2;padding:96px 24px 84px;text-align:center;position:relative;overflow:hidden}
+.hero .tag{display:inline-block;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase;
+  color:#7fe9c4;border:1px solid #1f4a44;border-radius:999px;padding:6px 14px;margin-bottom:26px}
+.hero h1{font-size:clamp(2.4rem,6vw,4rem);line-height:1.05;letter-spacing:-.02em;font-weight:800}
+.hero h1 .accent{background:linear-gradient(90deg,#19c98e,#7fe9c4);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{max-width:680px;margin:22px auto 0;font-size:1.18rem;color:#aebcc0;line-height:1.55}
+.cta{margin-top:38px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 24px;border-radius:10px;
+  font-weight:600;font-size:.98rem;transition:transform .08s ease}
+.btn:hover{text-decoration:none;transform:translateY(-1px)}
+.btn-primary{background:var(--accent);color:#06231a}
+.btn-ghost{background:transparent;color:#dbe7e4;border:1px solid #2a4a48}
+
+/* sections */
+section{padding:74px 24px}
+.wrap{max-width:1000px;margin:0 auto}
+.eyebrow{color:var(--accent-d);font-weight:700;font-size:.82rem;letter-spacing:.12em;text-transform:uppercase}
+h2{font-size:clamp(1.6rem,3.5vw,2.2rem);line-height:1.15;letter-spacing:-.01em;margin:.3em 0 .2em}
+.lead{color:var(--muted);font-size:1.08rem;max-width:720px;margin-top:.5em}
+
+.pillars{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;margin-top:44px}
+.card{border:1px solid var(--line);border-radius:14px;padding:26px;background:#fff;
+  transition:box-shadow .15s ease,border-color .15s ease}
+.card:hover{box-shadow:0 8px 30px rgba(10,40,30,.07);border-color:#cfe7dd}
+.card .ic{width:42px;height:42px;border-radius:10px;background:#e7f7f0;color:var(--accent-d);
+  display:flex;align-items:center;justify-content:center;font-size:1.3rem;margin-bottom:16px}
+.card h3{font-size:1.12rem;margin-bottom:8px}
+.card p{color:var(--muted);font-size:.96rem}
+
+/* loop diagram */
+.loop{background:#f6f9f8;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.flow{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-top:40px;align-items:stretch}
+.node{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 14px;text-align:center;position:relative}
+.node .n{font-size:.72rem;color:var(--accent-d);font-weight:700;letter-spacing:.08em}
+.node h4{font-size:.98rem;margin:6px 0 4px}
+.node p{font-size:.82rem;color:var(--muted);line-height:1.4}
+.node:not(:last-child)::after{content:"→";position:absolute;right:-13px;top:50%;transform:translateY(-50%);
+  color:var(--accent);font-weight:700;font-size:1.1rem;z-index:2}
+
+/* facts */
+.facts{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:42px}
+.fact{text-align:center;padding:22px 12px;border:1px solid var(--line);border-radius:12px}
+.fact .big{font-size:1.7rem;font-weight:800;color:var(--ink);letter-spacing:-.02em}
+.fact .lbl{color:var(--muted);font-size:.86rem;margin-top:4px}
+
+/* paper band */
+.paper{background:var(--dark2);color:#e7eeec}
+.paper .wrap{display:flex;gap:40px;align-items:center;flex-wrap:wrap;justify-content:space-between}
+.paper h2{color:#fff}
+.paper p{color:#a9bdb8;max-width:520px;margin-top:10px}
+.paper .links{display:flex;gap:14px;flex-wrap:wrap;margin-top:6px}
+
+footer{padding:46px 24px;border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
+footer .wrap{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+.disclaimer{margin-top:14px;font-size:.8rem;color:#90999f;max-width:760px;line-height:1.5}
+
+@media(max-width:820px){
+  .pillars{grid-template-columns:1fr}
+  .flow{grid-template-columns:1fr;gap:26px}
+  .node:not(:last-child)::after{content:"↓";right:50%;top:auto;bottom:-22px;transform:translateX(50%)}
+  .facts{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <span class="tag">Peer-to-peer · on-chain · artist-first</span>
+  <h1>The listeners <span class="accent">are</span> the network.</h1>
+  <p class="sub">MusicChain is a peer-to-peer music network where the people listening also deliver the audio, content is recognized by how it <em>sounds</em>, and every genuine play pays the artist, the seeder, and the relay — settled on a purpose-built blockchain.</p>
+  <div class="cta">
+    <a class="btn btn-primary" href="whitepaper.html">Read the white paper →</a>
+    <a class="btn btn-ghost" href="https://github.com/knobcore/musicchain">View on GitHub</a>
+  </div>
+</header>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">The core idea</span>
+    <h2>Three mechanisms, one loop</h2>
+    <p class="lead">Streaming is three businesses stacked together — a catalogue, a delivery network, and a payment rail. MusicChain re-arranges that stack so the audience supplies the pipe and the ledger settles the pay.</p>
+    <div class="pillars">
+      <div class="card">
+        <div class="ic">⇄</div>
+        <h3>Listeners are the CDN</h3>
+        <p>When you hold a song, your device seeds it to others — BitTorrent-style multi-source transfer. Bandwidth scales with the audience instead of a server bill, and every 256&nbsp;KB piece is checksum-verified on arrival.</p>
+      </div>
+      <div class="card">
+        <div class="ic">◎</div>
+        <h3>Paid per play, on-chain</h3>
+        <p>A genuine play mints to everyone who made it happen — artist, full node, listener, the <strong>seeder</strong> that served the bytes, and the <strong>relay</strong> that carried them. Five lanes, one token each, recorded on a public ledger.</p>
+      </div>
+      <div class="card">
+        <div class="ic">♪</div>
+        <h3>Identified by sound</h3>
+        <p>An acoustic fingerprint collapses every upload of the same recording into one canonical entry — so the swarm pools all copies and the royalty always lands on one artist, regardless of who uploaded which file.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="loop">
+  <div class="wrap">
+    <span class="eyebrow">How a play propagates</span>
+    <h2>From “tap play” to “everyone paid”</h2>
+    <p class="lead">The audio path and the accounting path run in parallel and meet only at the end, when the session reports who served the bytes.</p>
+    <div class="flow">
+      <div class="node"><div class="n">① DISCOVER</div><h4>Who has it?</h4><p>The node returns online seeders plus the piece manifest.</p></div>
+      <div class="node"><div class="n">② FETCH</div><h4>Swarm pull</h4><p>Pieces stream from multiple seeders via a relay, ≤4&nbsp;Mbit/s each.</p></div>
+      <div class="node"><div class="n">③ VERIFY</div><h4>Per-piece hash</h4><p>Each piece is SHA-256-checked; a bad one is refetched elsewhere.</p></div>
+      <div class="node"><div class="n">④ ACCOUNT</div><h4>Session</h4><p>Heartbeats prove ≥50% was genuinely heard, not looped.</p></div>
+      <div class="node"><div class="n">⑤ SETTLE</div><h4>5-lane mint</h4><p>The node signs a proof and mints to all five participants.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">At a glance</span>
+    <h2>Built, not theoretical</h2>
+    <div class="facts">
+      <div class="fact"><div class="big">5</div><div class="lbl">reward lanes per play</div></div>
+      <div class="fact"><div class="big">256&nbsp;KB</div><div class="lbl">verified pieces, multi-source</div></div>
+      <div class="fact"><div class="big">Private</div><div class="lbl">network-tagged DHT — no public BitTorrent</div></div>
+      <div class="fact"><div class="big">Non-custodial</div><div class="lbl">escrow held by the chain, not an operator</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="paper">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow" style="color:#7fe9c4">Documentation</span>
+      <h2>The technical white paper</h2>
+      <p>Network topology, the end-to-end data-propagation flow, the transfer layer, the chain &amp; play lifecycle, tokenomics, the security model, and the real bandwidth/scaling math — written for non-developers without dumbing it down for engineers.</p>
+    </div>
+    <div class="links">
+      <a class="btn btn-primary" href="whitepaper.html">Read online</a>
+      <a class="btn btn-ghost" href="whitepaper.pdf">Download PDF</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:40px">
+  <div class="wrap">
+    <span class="eyebrow">Get it</span>
+    <h2>Run the player</h2>
+    <p class="lead">Cross-platform client (Windows desktop + Android). Builds and the white paper PDF are published on the GitHub releases page.</p>
+    <div class="cta" style="justify-content:flex-start">
+      <a class="btn btn-primary" href="https://github.com/knobcore/musicchain/releases">Downloads &amp; releases →</a>
+      <a class="btn btn-ghost" style="color:#0a7d5a;border-color:#cfe7dd" href="https://github.com/knobcore/musicchain">Source code</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div><strong>MusicChain</strong> · open-source · <a href="https://github.com/knobcore/musicchain">github.com/knobcore/musicchain</a></div>
+    <div><a href="whitepaper.html">White paper</a> · <a href="whitepaper.pdf">PDF</a></div>
+  </div>
+  <div class="wrap"><p class="disclaimer">This site describes how the system works. It is a technical description, not financial advice, and makes no claim about the monetary value of any token; the token is described purely as the network’s internal accounting and reward unit. Not an offer, solicitation, or financial instrument.</p></div>
+</footer>
+
+</body>
+</html>
