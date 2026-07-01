@@ -2,20 +2,11 @@
 
 *A peer-to-peer music network where the listeners are the infrastructure, content
 is verified by cryptographic fingerprint, and every play settles on a purpose-built
-blockchain.*
+blockchain. This is a technical description of how the system works. It is not financial
+advice and makes no claim about the monetary value of any token; the token is
+described purely as the network's internal accounting and reward unit.*
 
 ---
-
-## How to read this paper
-
-Each section is written in two layers. The **plain-language** paragraphs explain
-*what* a piece does and *why* it exists — no prior knowledge assumed. The
-**Under the hood** notes give the exact mechanism, sizes, and algorithms so an
-engineer can implement or audit it. Diagrams are ASCII so they render anywhere.
-
-> This is a technical description of how the system works. It is not financial
-> advice and makes no claim about the monetary value of any token; the token is
-> described purely as the network's internal accounting and reward unit.
 
 **Contents**
 
@@ -37,18 +28,34 @@ engineer can implement or audit it. Diagrams are ASCII so they render anywhere.
 
 ---
 
-## 1. The problem
+## 1. The problems
 
-Streaming services are three businesses stacked together: a **catalogue** (rights
-deals), a **content-delivery network** (servers that ship the audio), and a
-**payment rail** (who gets paid, how much, when). The artist sits at the bottom of
-that stack and receives a few tenths of a cent per stream, opaquely, weeks later.
-The CDN is a fixed cost the platform pays for and controls.
+The subscription model is a poor economic model for media distribution and consumption.
+
+When Napster, Spotify and other technolgies were created, cryptocurrency did not exist.
+
+When you charge a subscription for an all you can eat buffet, royalties etc aren't as good
+as charging $20 for a physical copy. They can't be. One million artists at a subscription fee of
+less than $20 practically robs artists anyway since that subscription fee divided by those million
+artists is $0.00002. So, they also HAVE to do independent artists dirty, their royalties are going to
+Taylor Swift instead.
 
 Bopwire re-arranges that stack so the **people listening also supply the
 delivery network**, the **payment is settled per play on a public ledger**, and no
-single company owns the pipe. The hard part isn't any one of those ideas — it's
-making them work *together* without a central server in the middle.
+single company owns the pipe.
+
+In our research of cryptocurrencies with similar supply caps, even the small cap coins can
+fetch $0.10 on the market. Even with .01 cents, the platform pays as much or more as
+Apple **PER STREAM SERVED**. The general idea would be for the majority of music players to use
+this kind of technology, so that every play is accounted for and paid for.
+
+In addition, independent artists today practically have to *pay* to get heard. There is a lot of
+debt in the sense of new music and listeners, and there's so much of it that it has become *spam*
+to the listener.
+
+To combat this problem, Bopwire pays the *listener* for plays under 10,000. We have asked this question:
+Should someone who discovers something great and plays it a lot be paid to organize the quality? We
+beleive the answer is actually yes, but artists shouldn't have to pay for those listens.
 
 ---
 
@@ -62,6 +69,7 @@ Three mechanisms are wired into one loop:
 2. **Everyone who did work gets paid per play, on-chain.** Not just the artist —
    the **peer that uploaded the bytes** (the *seeder*) and the **relay that carried
    them** are each credited a token every time a song is genuinely listened to.
+   Those that put in work to listen to new and undiscovered music also get paid.
 3. **Content is identified by what it sounds like.** An audio *fingerprint*
    collapses every upload of the same song into one canonical entry, so the swarm
    pools all copies and the royalty always lands on one artist — regardless of who
@@ -78,34 +86,7 @@ controls.
 Four roles exist. A single device can play several of them at once (a phone is a
 listener, a seeder, and a wallet simultaneously).
 
-```
-                       ┌──────────────────────────────────┐
-                       │           FULL NODE               │
-                       │  • produces & validates blocks    │
-                       │    (LevelDB-backed chain)         │
-                       │  • broker: who holds which song   │
-                       │    (SwarmIndex / DB2)             │
-                       │  • runs the play-session pipeline │
-                       │  • serves wallet + chain queries  │
-                       └─────────────┬────────────────────┘
-                                     │  control RPCs
-                                     │  (session.*, stream.open,
-                                     │   fingerprint.submit, wallet.*)
-                         ┌───────────┴────────────┐
-                         │       MINI-NODES        │   relays / NAT bridges
-                         │  • forward audio bytes  │   earn 1 token per stream
-                         │    + control messages   │
-                         │  • the public IPs that  │
-                         │    listeners dial into  │
-                         └───┬─────────────────┬───┘
-              relayed audio  │                 │  relayed audio
-              (binary frames)│                 │
-                 ┌───────────┴──┐         ┌────┴──────────┐
-                 │   PLAYER A    │  swarm  │   PLAYER B     │
-                 │ listener +    │◀═══════▶│ listener +     │
-                 │ seeder + wallet│ (pieces │ seeder + wallet│
-                 └───────────────┘ via relay)└──────────────┘
-```
+![Network topology — a full node above mini-node relays above two peer players](d-topology.svg)
 
 **In plain terms.** Listeners (players) don't usually connect to each other
 directly — they connect to **mini-nodes**, which are relays sitting on reachable
@@ -114,14 +95,10 @@ one downloading). The **full node** is the bookkeeper and rule-keeper: it knows 
 holds what, runs the rules that decide a "real" play, and writes the blockchain.
 
 **Under the hood.**
-- Transport is **librats**, a custom C++ peer-to-peer library (QUIC/TCP messaging +
-  a binary side-channel). Ports: full node `p2p_port 9333`, rats RPC `9080`, a JSON-RPC
-  API on `8545`; mini-node rats port `8080`.
-- Identity is unified: a peer's **rats peer-id == its wallet address** (20-byte
-  secp256k1 address). One key is your network identity *and* your wallet.
+- Transport is **librats**, a custom C++ peer-to-peer library.
+- Identity is unified: one key is your network identity *and* your wallet.
 - Mini-nodes exist because most listeners are behind NAT and can't accept inbound
-  connections; the relay is the rendezvous. It's also a deliberate economic choice
-  (see §8).
+  connections. It's also a deliberate economic choice (see §8).
 
 ---
 
@@ -130,35 +107,7 @@ holds what, runs the rules that decide a "real" play, and writes the blockchain.
 This is the central data-flow. Follow a single song from "tap play" to "everyone
 paid."
 
-```
- LISTENER              FULL NODE           MINI-NODE (relay)        SEEDER
-    │                     │                     │                    │
- ─① stream.open(hash) ───▶│                     │                    │
-    │  "who has this?"    │                     │                    │
-    │◀ peers + MANIFEST ──│ (SwarmIndex lookup) │                    │
-    │                     │                     │                    │
- ─② swarm.fetch(N..M) ──────────────────────────▶ relay.forward ────▶│
-    │  "send pieces N..M" │                     │                    │
-    │                     │                     │◀── binary pieces ──│
-    │◀══ F-frame pieces ═══════════════════════ │   (paced ≤4 Mbit/s)│
-    │   each piece sha256-checked vs MANIFEST    │                    │
-    │   (bad piece → refetch from another seeder)│                    │
-    │                     │                     │                    │
- ─③ session.start ───────▶│                     │                    │
-    │  session.heartbeat ─▶│  (position_ms / 5s) │                    │
-    │  ...                 │                     │                    │
- ─③ session.complete ─────▶│ (+ seeder addr,     │                    │
-    │                      │    + mini-node addr) │                   │
-    │                      │                      │                   │
-    │                  ④ validate:                │                   │
-    │                     • ≥50% effective listen │                   │
-    │                     • heartbeat density      │                  │
-    │                     sign PlayProof (node key)│                  │
-    │                     mint 5 lanes ──────────▶ [ block ]          │
-    │◀── balances move ───│  artist · node ·       │                  │
-    │                      │  discoverer · seeder · │                 │
-    │                      │  mini-node             │                 │
-```
+![Anatomy of a play — a sequence diagram across listener, full node, mini-node and seeder: discover, fetch, account, settle](d-anatomy.svg)
 
 **Step by step.**
 
@@ -217,23 +166,7 @@ upload speeds, not any one peer's. Every piece arrives with a checksum the uploa
 *can't fake*, so pulling from strangers is safe — a bad piece is detected instantly
 and refetched elsewhere.
 
-```
-   manifest (signed list of per-piece SHA-256, from the full node)
-        piece0:ab12…  piece1:9f04…  piece2:7c55…  …  pieceK:e3a1…
-
-                 ┌──────────┐
-   pieces 0–7    │ SEEDER 1 │──┐ ≤4 Mbit/s
-                 └──────────┘  │
-                 ┌──────────┐  │ via      ┌────────────────────┐
-   pieces 8–15   │ SEEDER 2 │──┼─relays──▶│     DOWNLOADER       │
-                 └──────────┘  │          │ • reassembles in     │
-                 ┌──────────┐  │          │   order              │
-   pieces 16–23  │ SEEDER 3 │──┘          │ • sha256-checks each │
-                 └──────────┘             │   piece vs manifest  │
-                                          │ • endgame: dup the   │
-   aggregate throughput ≈ N × 4 Mbit/s    │   last few pieces    │
-                                          └────────────────────┘
-```
+![Multi-source swarm — three seeders each serving a piece range through a relay to one downloader, every piece checked against the manifest](d-swarm.svg)
 
 **Under the hood.**
 - **Pieces:** 256 KB. **Ranges:** a `swarm.fetch{piece_start,count}` pulls up to 16
@@ -264,17 +197,9 @@ Bopwire nodes, never the public BitTorrent network.
 
 **Under the hood.**
 - The DHT speaks the standard Kademlia/KRPC wire format **but every packet carries a
-  private network tag** (a top-level `"mc":"mcnet1"` key). Any inbound packet
-  missing the tag is dropped at decode — so the public BitTorrent mainline (all the
-  `:6881` nodes) can never enter the routing table, and Bopwire nodes never
-  answer them. It bootstraps only from configured Bopwire nodes, never the public
-  routers (`router.bittorrent.com`, etc.).
-- This keeps the routing table full of *only* Bopwire peers, so content lookups
-  aren't diluted by millions of unrelated nodes. Bump the magic to fork a separate
-  network (e.g. testnet vs mainnet) — nodes with mismatched tags simply ignore each
-  other.
-- In practice the **full node's SwarmIndex** is the primary, fast discovery path
-  ("who's online and holds hash X"); the DHT is the resilient fallback.
+  private network tag** (a top-level `"mc":"mcnet1"` key). Any inbound packet missing
+  the tag is dropped at decode, so the public BitTorrent mainline can never enter the
+  routing table and Bopwire nodes never answer it.
 
 ---
 
@@ -283,7 +208,7 @@ Bopwire nodes, never the public BitTorrent network.
 **In plain terms.** Most phones and home machines can't accept incoming
 connections (they're behind NAT/firewalls). The **mini-node** is a relay on a
 reachable address that bridges two such peers. Crucially, relaying is a **paid job**
-— a mini-node earns a token every time it carries a stream — so there's an incentive
+— a mini-node earns a token every time it carries a stream or download — so there's an incentive
 to run the infrastructure that keeps the network reachable.
 
 **Under the hood.**
@@ -292,11 +217,7 @@ to run the infrastructure that keeps the network reachable.
   content-agnostic — it doesn't parse the audio, it just bridges.
 - The relay is also a deliberate economic anchor: routing the data path through a
   paid relay is what funds the reachable-IP layer. (Direct peer connections + ICE
-  hole-punching exist in the stack but are off by default — they proved flaky and
-  they'd bypass the relay reward.)
-- Backpressure lives at the seeder (the 4 Mbit/s pace); the relay enforces only
-  anti-flood limits. There is no per-destination throttle — a download can saturate
-  a relay, and you scale by adding mini-nodes, not by throttling tenants.
+  hole-punching exist in the stack but are off by default.)
 
 ---
 
@@ -308,19 +229,12 @@ you can't loop a 5-second clip or fake 10,000 plays to print tokens.
 
 **The session lifecycle.** A play is a three-message conversation with the full node:
 
-```
-  session.start      → node opens a session (content_hash, listener)
-  session.heartbeat  → player reports playback position every ~5s
-        … (repeat while actually playing) …
-  session.complete   → player says "done" (+ seeder & relay addresses)
-                       node runs the gates, then mints if it passes
-```
+![Session lifecycle — start, then heartbeat while playing, then complete, then the anti-cheat gates and mint](d-session.svg)
 
 **The anti-cheat gates (run at `session.complete`).**
 - **Coverage gate:** the union of *distinct* position ranges actually heard must
-  cover **≥50%** of the song's registered duration (falls back to ≥30s if duration
-  is unknown). Re-listening the same 5 seconds collapses to 5 seconds of coverage —
-  you can't loop a clip to qualify.
+  cover **≥50%** of the song's registered duration. Re-listening the same 5 seconds
+  collapses to 5 seconds of coverage — you can't loop a clip to qualify.
 - **Density gate:** heartbeats must arrive at a plausible rate (≥1 per ~10s of wall
   time), so you can't fast-forward and "complete" instantly.
 - **Replay protection:** each `session_id` is single-use, persisted on-chain; a
@@ -351,23 +265,35 @@ outputs and applies it to the next block.
 happen** — not just the artist. The token is the network's internal unit of account
 and reward; it is consumed and earned by participation.
 
-```
-   ONE qualifying play  ──────▶  mint 1 token to each lane:
+![The five reward lanes minted per qualifying play, and the post-10,000-play burn](d-rewards.svg)
 
-     ┌──────────────────────────────────────────────────────────┐
-     │  ARTIST      → escrow_address(artist)  (released on KYC)   │
-     │  FULL NODE   → the validator that processed the play       │
-     │  DISCOVERER  → the listener            (pre-threshold tier) │
-     │  SEEDER      → the peer that served the bytes              │
-     │              (skipped if seeder == listener — no self-seed) │
-     │  MINI-NODE   → the relay that carried the stream           │
-     └──────────────────────────────────────────────────────────┘
+Listening to popular artists spends tokens, and those tokens are burned at a variable
+rate — taken out of circulation for good. What survives the burn flows the other way:
+to the artists who made the thing and the seeders who keep it alive on the network. So
+the economy runs as a loop, not a pump — value is drawn in at one end by attention and
+paid out at the other to the people doing the actual work, with the burn sitting in
+between as the throttle.
 
-   After a song passes 10,000 plays:
-     • artist + node + seeder + mini-node lanes continue
-     • the discoverer lane is replaced by a listener BURN that
-       grows cubically as total supply approaches the cap
-```
+We have put some cybernetics ideas into this as well. When the network runs hot — more
+plays, more transfers — more is burned, and supply tightens against its own activity;
+when it runs cool, the pressure eases. There's no hand on the dial and no central bank.
+So here, the burn is the *governor*: a negative feedback loop that holds the token near
+equilibrium the way a steam engine's governor holds its speed. The upshot is that the
+currency can't inflate itself into noise — the more it's used, the more disciplined it
+becomes, and value keeps settling on the parts of the system that create and sustain
+rather than the parts that merely consume.
+
+To quote Stafford Beer:
+
+> *"According to the science of cybernetics, which deals with the topic of control in
+> every kind of system (mechanical, electronic, biological, human, economic, and so on),
+> there is a natural law that governs the capacity of a control system to work. It says
+> that the control must be capable of generating as much 'variety' as the situation to
+> be controlled."*
+
+In that sense, the burn is built in accordance with Ashby's Law (which is what Beer is
+referencing here) — the requisite (negative-feedback) variety matched to the state of
+the system that would otherwise inflate.
 
 **Under the hood.**
 - Precision: `1 token = 1e8` internal units (like satoshis). Each lane is exactly
@@ -381,9 +307,7 @@ and reward; it is consumed and earned by participation.
   *cubically* — roughly: 1.0 B supply ⇒ 0 burned, 1.5 B ⇒ ~125, 1.8 B ⇒ ~512 — so
   usage gets deflationary pressure as the chain approaches the cap, and minting
   refuses past it.
-- **The mini-node lane is per-stream, not per-byte.** Earlier the relay earned a
-  byte-metered `RelayRewardTx`; that is retired in favor of a flat 1-token-per-play
-  credit. (The old transaction type is kept only so historical blocks still replay.)
+- **The mini-node lane is per-stream, not per-byte.**
 
 ---
 
@@ -447,33 +371,6 @@ a flood of fake moderators approving fake identity claims would be an attack.
 
 ---
 
-## 14. Scaling — what the bandwidth actually costs
-
-Because every audio byte is **relayed** (`seeder → mini-node → listener`), each
-active stream costs a mini-node **2× the flow rate** — once on ingress, once on
-egress.
-
-```
-   one active stream at the 4 Mbit/s cap  =  4 in + 4 out  =  8 Mbit/s on the relay
-```
-
-- **Measured baseline:** one capped stream ≈ 4 Mbit/s in + 4 Mbit/s out ≈ 8 Mbit/s.
-- **Capacity (≈1 Gbit/s relay NIC):** ~**125 concurrent capped streams** before
-  saturation. Steady *playback* (song bitrate ~256 kbit/s, not the 4 Mbit/s burst)
-  is ~0.5 Mbit/s/stream — so **~2,000 steady streamers** fit on one relay.
-- **For 200 users:** one ~1 Gbit mini-node comfortably serves steady streaming
-  (~100 Mbit/s peak); the only stress is many *concurrent downloads* bursting at the
-  cap. The fix is horizontal: players load-balance across a **mesh of mini-nodes** —
-  budget roughly **one 1 Gbit relay per ~125 concurrent capped flows**, far more for
-  steady streaming.
-- The real recurring cost is **metered data**, not peak Mbit/s: roughly *2× song
-  size per play* (in + out). At ~8 MB/song, 200 active users at 20 plays/day ≈
-  **~1.9 TB/month**; at 50 plays/day ≈ **~4.8 TB/month**.
-
-CPU and memory are not the constraint at these scales — bandwidth is.
-
----
-
 ## 15. Decentralization posture
 
 Bopwire is **decentralized where it can be and centralized only where a public
@@ -490,17 +387,8 @@ process would be unsafe** — and it keeps those layers separate on purpose:
   *can't divert* — not a custodial one.
 - **Stewardship:** development and root authority currently rest with a founder
   operating as a node on the *same terms as any operator* (no special token reward,
-  no fee, no allocation). The intended trajectory is the Linux model — a steward atop
-  a widening, independent base of node operators and moderators, with issuance
-  immutable underneath.
+  no fee, no allocation).
 
 The design goal is a network whose **value is created by its participants and
 recorded on a ledger no one privately owns**, with the unavoidable trust (identity,
 takedown) confined to a narrow, accountable, non-custodial role.
-
----
-
-*This document describes the system as implemented across the `bopwire`
-(C++ node/chain), `librats` (P2P transport), and `bopwire_player`
-(cross-platform client) components. It is a technical specification, not an offer,
-solicitation, or financial instrument.*

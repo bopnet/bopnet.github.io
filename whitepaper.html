@@ -31,6 +31,9 @@ blockquote{margin:1.2em 0;padding:.6em 1.1em;border-left:3px solid var(--accent)
 blockquote p{margin:.2em 0}
 ul,ol{margin:.6em 0;padding-left:1.4em}
 li{margin:.25em 0}
+figure.dia{margin:1.9em 0;text-align:center}
+figure.dia img,img.dia{max-width:100%;height:auto;display:inline-block;
+  border:1px solid var(--line);border-radius:12px;background:#fff;padding:14px 12px}
 .topbar{max-width:860px;margin:0 auto;padding:14px 72px;color:var(--muted);font-size:.85rem;
   display:flex;justify-content:space-between;align-items:center}
 .topbar a{color:var(--muted)}
@@ -46,13 +49,10 @@ li{margin:.25em 0}
 </style></head>
 <body>
 <div class="topbar"><span>Bopwire — Technical White Paper</span>
-<span><a href="index.html">Home</a> &nbsp;·&nbsp; <a href="whitepaper.pdf">PDF</a></span></div>
+<span><a href="index.html">Home</a></span></div>
 <main class="wrap"><h1>Bopwire — Technical White Paper</h1>
-<p>*A peer-to-peer music network where the listeners are the infrastructure, content is verified by cryptographic fingerprint, and every play settles on a purpose-built blockchain.*</p>
+<p><em>A peer-to-peer music network where the listeners are the infrastructure, content is verified by cryptographic fingerprint, and every play settles on a purpose-built blockchain. This is a technical description of how the system works. It is not financial advice and makes no claim about the monetary value of any token; the token is described purely as the network&#x27;s internal accounting and reward unit.</em></p>
 <hr/>
-<h2>How to read this paper</h2>
-<p>Each section is written in two layers. The <strong>plain-language</strong> paragraphs explain *what* a piece does and *why* it exists — no prior knowledge assumed. The <strong>Under the hood</strong> notes give the exact mechanism, sizes, and algorithms so an engineer can implement or audit it. Diagrams are ASCII so they render anywhere.</p>
-<blockquote>This is a technical description of how the system works. It is not financial advice and makes no claim about the monetary value of any token; the token is described purely as the network&#x27;s internal accounting and reward unit.</blockquote>
 <p><strong>Contents</strong></p>
 <ol>
 <li>The problem</li>
@@ -72,105 +72,53 @@ li{margin:.25em 0}
 <li>Decentralization posture</li>
 </ol>
 <hr/>
-<h2>1. The problem</h2>
-<p>Streaming services are three businesses stacked together: a <strong>catalogue</strong> (rights deals), a <strong>content-delivery network</strong> (servers that ship the audio), and a <strong>payment rail</strong> (who gets paid, how much, when). The artist sits at the bottom of that stack and receives a few tenths of a cent per stream, opaquely, weeks later. The CDN is a fixed cost the platform pays for and controls.</p>
-<p>Bopwire re-arranges that stack so the <strong>people listening also supply the delivery network</strong>, the <strong>payment is settled per play on a public ledger</strong>, and no single company owns the pipe. The hard part isn&#x27;t any one of those ideas — it&#x27;s making them work *together* without a central server in the middle.</p>
+<h2>1. The problems</h2>
+<p>The subscription model is a poor economic model for media distribution and consumption.</p>
+<p>When Napster, Spotify and other technolgies were created, cryptocurrency did not exist.</p>
+<p>When you charge a subscription for an all you can eat buffet, royalties etc aren&#x27;t as good as charging $20 for a physical copy. They can&#x27;t be. One million artists at a subscription fee of less than $20 practically robs artists anyway since that subscription fee divided by those million artists is $0.00002. So, they also HAVE to do independent artists dirty, their royalties are going to Taylor Swift instead.</p>
+<p>Bopwire re-arranges that stack so the <strong>people listening also supply the delivery network</strong>, the <strong>payment is settled per play on a public ledger</strong>, and no single company owns the pipe.</p>
+<p>In our research of cryptocurrencies with similar supply caps, even the small cap coins can fetch $0.10 on the market. Even with .01 cents, the platform pays as much or more as Apple <strong>PER STREAM SERVED</strong>. The general idea would be for the majority of music players to use this kind of technology, so that every play is accounted for and paid for.</p>
+<p>In addition, independent artists today practically have to <em>pay</em> to get heard. There is a lot of debt in the sense of new music and listeners, and there&#x27;s so much of it that it has become <em>spam</em> to the listener.</p>
+<p>To combat this problem, Bopwire pays the <em>listener</em> for plays under 10,000. We have asked this question: Should someone who discovers something great and plays it a lot be paid to organize the quality? We beleive the answer is actually yes, but artists shouldn&#x27;t have to pay for those listens.</p>
 <hr/>
 <h2>2. The core idea</h2>
 <p>Three mechanisms are wired into one loop:</p>
 <ol>
-<li><strong>Listeners are the CDN.</strong> When you have a song, your device *seeds* it to</li>
+<li><strong>Listeners are the CDN.</strong> When you have a song, your device <em>seeds</em> it to</li>
 </ol>
 <p>   other listeners — like BitTorrent. Bandwidth scales with the audience instead of    with a server bill.</p>
 <ol>
 <li><strong>Everyone who did work gets paid per play, on-chain.</strong> Not just the artist —</li>
 </ol>
-<p>   the <strong>peer that uploaded the bytes</strong> (the *seeder*) and the <strong>relay that carried    them</strong> are each credited a token every time a song is genuinely listened to.</p>
+<p>   the <strong>peer that uploaded the bytes</strong> (the <em>seeder</em>) and the <strong>relay that carried    them</strong> are each credited a token every time a song is genuinely listened to.    Those that put in work to listen to new and undiscovered music also get paid.</p>
 <ol>
-<li><strong>Content is identified by what it sounds like.</strong> An audio *fingerprint*</li>
+<li><strong>Content is identified by what it sounds like.</strong> An audio <em>fingerprint</em></li>
 </ol>
 <p>   collapses every upload of the same song into one canonical entry, so the swarm    pools all copies and the royalty always lands on one artist — regardless of who    uploaded which file.</p>
-<p>The result is a self-bootstrapping delivery network where the users *are* the infrastructure and are compensated for it, settled on a ledger no one privately controls.</p>
+<p>The result is a self-bootstrapping delivery network where the users <em>are</em> the infrastructure and are compensated for it, settled on a ledger no one privately controls.</p>
 <hr/>
 <h2>3. Network topology (who talks to whom)</h2>
 <p>Four roles exist. A single device can play several of them at once (a phone is a listener, a seeder, and a wallet simultaneously).</p>
-<pre><code>                       ┌──────────────────────────────────┐
-                       │           FULL NODE               │
-                       │  • produces &amp; validates blocks    │
-                       │    (LevelDB-backed chain)         │
-                       │  • broker: who holds which song   │
-                       │    (SwarmIndex / DB2)             │
-                       │  • runs the play-session pipeline │
-                       │  • serves wallet + chain queries  │
-                       └─────────────┬────────────────────┘
-                                     │  control RPCs
-                                     │  (session.*, stream.open,
-                                     │   fingerprint.submit, wallet.*)
-                         ┌───────────┴────────────┐
-                         │       MINI-NODES        │   relays / NAT bridges
-                         │  • forward audio bytes  │   earn 1 token per stream
-                         │    + control messages   │
-                         │  • the public IPs that  │
-                         │    listeners dial into  │
-                         └───┬─────────────────┬───┘
-              relayed audio  │                 │  relayed audio
-              (binary frames)│                 │
-                 ┌───────────┴──┐         ┌────┴──────────┐
-                 │   PLAYER A    │  swarm  │   PLAYER B     │
-                 │ listener +    │◀═══════▶│ listener +     │
-                 │ seeder + wallet│ (pieces │ seeder + wallet│
-                 └───────────────┘ via relay)└──────────────┘</code></pre>
+<figure class="dia"><img loading="lazy" src="d-topology.svg" alt="Network topology — a full node above mini-node relays above two peer players"></figure>
 <p><strong>In plain terms.</strong> Listeners (players) don&#x27;t usually connect to each other directly — they connect to <strong>mini-nodes</strong>, which are relays sitting on reachable public IP addresses. The mini-node passes audio between two listeners (one seeding, one downloading). The <strong>full node</strong> is the bookkeeper and rule-keeper: it knows who holds what, runs the rules that decide a &quot;real&quot; play, and writes the blockchain.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
-<li>Transport is <strong>librats</strong>, a custom C++ peer-to-peer library (QUIC/TCP messaging +</li>
-</ul>
-<p>  a binary side-channel). Ports: full node <code>p2p_port 9333</code>, rats RPC <code>9080</code>, a JSON-RPC   API on <code>8545</code>; mini-node rats port <code>8080</code>.</p>
-<ul>
-<li>Identity is unified: a peer&#x27;s <strong>rats peer-id == its wallet address</strong> (20-byte</li>
-</ul>
-<p>  secp256k1 address). One key is your network identity *and* your wallet.</p>
-<ul>
+<li>Transport is <strong>librats</strong>, a custom C++ peer-to-peer library.</li>
+<li>Identity is unified: one key is your network identity <em>and</em> your wallet.</li>
 <li>Mini-nodes exist because most listeners are behind NAT and can&#x27;t accept inbound</li>
 </ul>
-<p>  connections; the relay is the rendezvous. It&#x27;s also a deliberate economic choice   (see §8).</p>
+<p>  connections. It&#x27;s also a deliberate economic choice (see §8).</p>
 <hr/>
 <h2>4. Anatomy of a play (how data propagates, end-to-end)</h2>
 <p>This is the central data-flow. Follow a single song from &quot;tap play&quot; to &quot;everyone paid.&quot;</p>
-<pre><code> LISTENER              FULL NODE           MINI-NODE (relay)        SEEDER
-    │                     │                     │                    │
- ─① stream.open(hash) ───▶│                     │                    │
-    │  &quot;who has this?&quot;    │                     │                    │
-    │◀ peers + MANIFEST ──│ (SwarmIndex lookup) │                    │
-    │                     │                     │                    │
- ─② swarm.fetch(N..M) ──────────────────────────▶ relay.forward ────▶│
-    │  &quot;send pieces N..M&quot; │                     │                    │
-    │                     │                     │◀── binary pieces ──│
-    │◀══ F-frame pieces ═══════════════════════ │   (paced ≤4 Mbit/s)│
-    │   each piece sha256-checked vs MANIFEST    │                    │
-    │   (bad piece → refetch from another seeder)│                    │
-    │                     │                     │                    │
- ─③ session.start ───────▶│                     │                    │
-    │  session.heartbeat ─▶│  (position_ms / 5s) │                    │
-    │  ...                 │                     │                    │
- ─③ session.complete ─────▶│ (+ seeder addr,     │                    │
-    │                      │    + mini-node addr) │                   │
-    │                      │                      │                   │
-    │                  ④ validate:                │                   │
-    │                     • ≥50% effective listen │                   │
-    │                     • heartbeat density      │                  │
-    │                     sign PlayProof (node key)│                  │
-    │                     mint 5 lanes ──────────▶ [ block ]          │
-    │◀── balances move ───│  artist · node ·       │                  │
-    │                      │  discoverer · seeder · │                 │
-    │                      │  mini-node             │                 │</code></pre>
+<figure class="dia"><img loading="lazy" src="d-anatomy.svg" alt="Anatomy of a play — a sequence diagram across listener, full node, mini-node and seeder: discover, fetch, account, settle"></figure>
 <p><strong>Step by step.</strong></p>
 <ul>
-<li><strong>① Discover.</strong> The listener asks the full node *who has this content_hash*. The</li>
+<li><strong>① Discover.</strong> The listener asks the full node <em>who has this content_hash</em>. The</li>
 </ul>
 <p>  node answers with a list of online peers that hold it <strong>plus the song&#x27;s piece   manifest</strong> (the list of per-piece checksums — see §6). One round-trip; the   manifest means the listener already knows the file&#x27;s exact size and shape.</p>
 <ul>
-<li><strong>② Fetch.</strong> The listener requests a *range of pieces* with <code>swarm.fetch</code>. The</li>
+<li><strong>② Fetch.</strong> The listener requests a <em>range of pieces</em> with <code>swarm.fetch</code>. The</li>
 </ul>
 <p>  request travels to a seeder <strong>through a mini-node</strong> (<code>relay.forward</code>); the seeder   streams the bytes back as <strong>binary frames</strong> through the same relay. The seeder   paces itself to ≤4 Mbit/s per stream. The listener verifies each 256 KB piece   against the manifest&#x27;s SHA-256 as it arrives; a corrupt or lying piece fails its   hash and is refetched from a different seeder.</p>
 <ul>
@@ -178,18 +126,18 @@ li{margin:.25em 0}
 </ul>
 <p>  sends a position heartbeat every 5 seconds while actually playing, and on finish   reports <code>session.complete</code> — including the <strong>addresses of the seeder and relay</strong>   that served this play.</p>
 <ul>
-<li><strong>④ Settle.</strong> The node checks the play is genuine (§9), signs a *PlayProof*, and</li>
+<li><strong>④ Settle.</strong> The node checks the play is genuine (§9), signs a <em>PlayProof</em>, and</li>
 </ul>
 <p>  mints the five reward lanes into the next block. Balances update.</p>
 <p><strong>Why two parallel tracks?</strong> The <strong>audio</strong> path (①②) and the <strong>accounting</strong> path (③④) are deliberately decoupled. Audio flows peer-to-peer through relays; payment flows through the full node&#x27;s session pipeline. They meet only at the end, when the session reports who served the bytes.</p>
 <hr/>
 <h2>5. Content identity — fingerprinting &amp; canonical hashes</h2>
-<p><strong>In plain terms.</strong> Two people can upload &quot;the same song&quot; as different files (different bitrate, different encoder, a re-rip). Bopwire recognizes them as the *same song* by listening to them, not by comparing file bytes. That way the swarm pools every copy together and the artist earns no matter which copy played.</p>
+<p><strong>In plain terms.</strong> Two people can upload &quot;the same song&quot; as different files (different bitrate, different encoder, a re-rip). Bopwire recognizes them as the <em>same song</em> by listening to them, not by comparing file bytes. That way the swarm pools every copy together and the artist earns no matter which copy played.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li>Every song carries two hashes: a <strong><code>content_hash</code></strong> (SHA-256 of the exact audio</li>
 </ul>
-<p>  bytes — addresses *this file*) and a <strong><code>fingerprint_hash</code></strong> (SHA-256 of a   compressed <strong>Chromaprint</strong> acoustic fingerprint — addresses *this recording*).</p>
+<p>  bytes — addresses <em>this file</em>) and a <strong><code>fingerprint_hash</code></strong> (SHA-256 of a   compressed <strong>Chromaprint</strong> acoustic fingerprint — addresses <em>this recording</em>).</p>
 <ul>
 <li>On ingest the player computes both and submits via <code>fingerprint.submit</code>. The full</li>
 </ul>
@@ -201,22 +149,8 @@ li{margin:.25em 0}
 <hr/>
 <h2>6. The transfer layer — multi-source swarm with verified pieces</h2>
 <p>This is &quot;Swarm Transfer v2,&quot; the layer that actually moves the audio.</p>
-<p><strong>In plain terms.</strong> A song is cut into fixed 256 KB pieces. A download can pull different pieces from *several seeders at once*, so your speed is the sum of their upload speeds, not any one peer&#x27;s. Every piece arrives with a checksum the uploader *can&#x27;t fake*, so pulling from strangers is safe — a bad piece is detected instantly and refetched elsewhere.</p>
-<pre><code>   manifest (signed list of per-piece SHA-256, from the full node)
-        piece0:ab12…  piece1:9f04…  piece2:7c55…  …  pieceK:e3a1…
-
-                 ┌──────────┐
-   pieces 0–7    │ SEEDER 1 │──┐ ≤4 Mbit/s
-                 └──────────┘  │
-                 ┌──────────┐  │ via      ┌────────────────────┐
-   pieces 8–15   │ SEEDER 2 │──┼─relays──▶│     DOWNLOADER       │
-                 └──────────┘  │          │ • reassembles in     │
-                 ┌──────────┐  │          │   order              │
-   pieces 16–23  │ SEEDER 3 │──┘          │ • sha256-checks each │
-                 └──────────┘             │   piece vs manifest  │
-                                          │ • endgame: dup the   │
-   aggregate throughput ≈ N × 4 Mbit/s    │   last few pieces    │
-                                          └────────────────────┘</code></pre>
+<p><strong>In plain terms.</strong> A song is cut into fixed 256 KB pieces. A download can pull different pieces from <em>several seeders at once</em>, so your speed is the sum of their upload speeds, not any one peer&#x27;s. Every piece arrives with a checksum the uploader <em>can&#x27;t fake</em>, so pulling from strangers is safe — a bad piece is detected instantly and refetched elsewhere.</p>
+<figure class="dia"><img loading="lazy" src="d-swarm.svg" alt="Multi-source swarm — three seeders each serving a piece range through a relay to one downloader, every piece checked against the manifest"></figure>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li><strong>Pieces:</strong> 256 KB. <strong>Ranges:</strong> a <code>swarm.fetch{piece_start,count}</code> pulls up to 16</li>
@@ -225,7 +159,7 @@ li{margin:.25em 0}
 <ul>
 <li><strong>Manifest:</strong> generated at ingest — <code>sha256</code> of each piece — and served by the</li>
 </ul>
-<p>  full node alongside the peer list. Per-piece verification is what makes   *untrusted* multi-source safe: a bad piece fails its own hash (you know *which*   one) instead of only discovering corruption after assembling the whole file.   The whole-file <code>content_hash</code> is the final backstop.</p>
+<p>  full node alongside the peer list. Per-piece verification is what makes   <em>untrusted</em> multi-source safe: a bad piece fails its own hash (you know <em>which</em>   one) instead of only discovering corruption after assembling the whole file.   The whole-file <code>content_hash</code> is the final backstop.</p>
 <ul>
 <li><strong>Wire format:</strong> binary, not base64 — pieces stream as <code>F</code>-frames</li>
 </ul>
@@ -241,18 +175,10 @@ li{margin:.25em 0}
 <ul>
 <li>The DHT speaks the standard Kademlia/KRPC wire format **but every packet carries a</li>
 </ul>
-<p>  private network tag** (a top-level <code>&quot;mc&quot;:&quot;mcnet1&quot;</code> key). Any inbound packet   missing the tag is dropped at decode — so the public BitTorrent mainline (all the   <code>:6881</code> nodes) can never enter the routing table, and Bopwire nodes never   answer them. It bootstraps only from configured Bopwire nodes, never the public   routers (<code>router.bittorrent.com</code>, etc.).</p>
-<ul>
-<li>This keeps the routing table full of *only* Bopwire peers, so content lookups</li>
-</ul>
-<p>  aren&#x27;t diluted by millions of unrelated nodes. Bump the magic to fork a separate   network (e.g. testnet vs mainnet) — nodes with mismatched tags simply ignore each   other.</p>
-<ul>
-<li>In practice the <strong>full node&#x27;s SwarmIndex</strong> is the primary, fast discovery path</li>
-</ul>
-<p>  (&quot;who&#x27;s online and holds hash X&quot;); the DHT is the resilient fallback.</p>
+<p>  private network tag** (a top-level <code>&quot;mc&quot;:&quot;mcnet1&quot;</code> key). Any inbound packet missing   the tag is dropped at decode, so the public BitTorrent mainline can never enter the   routing table and Bopwire nodes never answer it.</p>
 <hr/>
 <h2>8. The relay layer — NAT traversal as a paid role</h2>
-<p><strong>In plain terms.</strong> Most phones and home machines can&#x27;t accept incoming connections (they&#x27;re behind NAT/firewalls). The <strong>mini-node</strong> is a relay on a reachable address that bridges two such peers. Crucially, relaying is a <strong>paid job</strong> — a mini-node earns a token every time it carries a stream — so there&#x27;s an incentive to run the infrastructure that keeps the network reachable.</p>
+<p><strong>In plain terms.</strong> Most phones and home machines can&#x27;t accept incoming connections (they&#x27;re behind NAT/firewalls). The <strong>mini-node</strong> is a relay on a reachable address that bridges two such peers. Crucially, relaying is a <strong>paid job</strong> — a mini-node earns a token every time it carries a stream or download — so there&#x27;s an incentive to run the infrastructure that keeps the network reachable.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li>A seeder&#x27;s bytes flow <code>seeder → mini-node → downloader</code>. The relay forwards opaque</li>
@@ -261,25 +187,17 @@ li{margin:.25em 0}
 <ul>
 <li>The relay is also a deliberate economic anchor: routing the data path through a</li>
 </ul>
-<p>  paid relay is what funds the reachable-IP layer. (Direct peer connections + ICE   hole-punching exist in the stack but are off by default — they proved flaky and   they&#x27;d bypass the relay reward.)</p>
-<ul>
-<li>Backpressure lives at the seeder (the 4 Mbit/s pace); the relay enforces only</li>
-</ul>
-<p>  anti-flood limits. There is no per-destination throttle — a download can saturate   a relay, and you scale by adding mini-nodes, not by throttling tenants.</p>
+<p>  paid relay is what funds the reachable-IP layer. (Direct peer connections + ICE   hole-punching exist in the stack but are off by default.)</p>
 <hr/>
 <h2>9. The chain — blocks, proofs, and the play lifecycle</h2>
-<p><strong>In plain terms.</strong> The blockchain is the shared, tamper-evident record of *what was played and who got paid*. A play only becomes money if it passes anti-cheat rules — you can&#x27;t loop a 5-second clip or fake 10,000 plays to print tokens.</p>
+<p><strong>In plain terms.</strong> The blockchain is the shared, tamper-evident record of <em>what was played and who got paid</em>. A play only becomes money if it passes anti-cheat rules — you can&#x27;t loop a 5-second clip or fake 10,000 plays to print tokens.</p>
 <p><strong>The session lifecycle.</strong> A play is a three-message conversation with the full node:</p>
-<pre><code>  session.start      → node opens a session (content_hash, listener)
-  session.heartbeat  → player reports playback position every ~5s
-        … (repeat while actually playing) …
-  session.complete   → player says &quot;done&quot; (+ seeder &amp; relay addresses)
-                       node runs the gates, then mints if it passes</code></pre>
+<figure class="dia"><img loading="lazy" src="d-session.svg" alt="Session lifecycle — start, then heartbeat while playing, then complete, then the anti-cheat gates and mint"></figure>
 <p><strong>The anti-cheat gates (run at <code>session.complete</code>).</strong></p>
 <ul>
-<li><strong>Coverage gate:</strong> the union of *distinct* position ranges actually heard must</li>
+<li><strong>Coverage gate:</strong> the union of <em>distinct</em> position ranges actually heard must</li>
 </ul>
-<p>  cover <strong>≥50%</strong> of the song&#x27;s registered duration (falls back to ≥30s if duration   is unknown). Re-listening the same 5 seconds collapses to 5 seconds of coverage —   you can&#x27;t loop a clip to qualify.</p>
+<p>  cover <strong>≥50%</strong> of the song&#x27;s registered duration. Re-listening the same 5 seconds   collapses to 5 seconds of coverage — you can&#x27;t loop a clip to qualify.</p>
 <ul>
 <li><strong>Density gate:</strong> heartbeats must arrive at a plausible rate (≥1 per ~10s of wall</li>
 </ul>
@@ -305,21 +223,12 @@ li{margin:.25em 0}
 <hr/>
 <h2>10. Economics — the five reward lanes, supply, and burn</h2>
 <p><strong>In plain terms.</strong> Every genuine play mints tokens to <strong>everyone who made it happen</strong> — not just the artist. The token is the network&#x27;s internal unit of account and reward; it is consumed and earned by participation.</p>
-<pre><code>   ONE qualifying play  ──────▶  mint 1 token to each lane:
-
-     ┌──────────────────────────────────────────────────────────┐
-     │  ARTIST      → escrow_address(artist)  (released on KYC)   │
-     │  FULL NODE   → the validator that processed the play       │
-     │  DISCOVERER  → the listener            (pre-threshold tier) │
-     │  SEEDER      → the peer that served the bytes              │
-     │              (skipped if seeder == listener — no self-seed) │
-     │  MINI-NODE   → the relay that carried the stream           │
-     └──────────────────────────────────────────────────────────┘
-
-   After a song passes 10,000 plays:
-     • artist + node + seeder + mini-node lanes continue
-     • the discoverer lane is replaced by a listener BURN that
-       grows cubically as total supply approaches the cap</code></pre>
+<figure class="dia"><img loading="lazy" src="d-rewards.svg" alt="The five reward lanes minted per qualifying play, and the post-10,000-play burn"></figure>
+<p>Listening to popular artists spends tokens, and those tokens are burned at a variable rate — taken out of circulation for good. What survives the burn flows the other way: to the artists who made the thing and the seeders who keep it alive on the network. So the economy runs as a loop, not a pump — value is drawn in at one end by attention and paid out at the other to the people doing the actual work, with the burn sitting in between as the throttle.</p>
+<p>We have put some cybernetics ideas into this as well. When the network runs hot — more plays, more transfers — more is burned, and supply tightens against its own activity; when it runs cool, the pressure eases. There&#x27;s no hand on the dial and no central bank. So here, the burn is the <em>governor</em>: a negative feedback loop that holds the token near equilibrium the way a steam engine&#x27;s governor holds its speed. The upshot is that the currency can&#x27;t inflate itself into noise — the more it&#x27;s used, the more disciplined it becomes, and value keeps settling on the parts of the system that create and sustain rather than the parts that merely consume.</p>
+<p>To quote Stafford Beer:</p>
+<blockquote><em>&quot;According to the science of cybernetics, which deals with the topic of control in every kind of system (mechanical, electronic, biological, human, economic, and so on), there is a natural law that governs the capacity of a control system to work. It says that the control must be capable of generating as much &#x27;variety&#x27; as the situation to be controlled.&quot;</em></blockquote>
+<p>In that sense, the burn is built in accordance with Ashby&#x27;s Law (which is what Beer is referencing here) — the requisite (negative-feedback) variety matched to the state of the system that would otherwise inflate.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li>Precision: <code>1 token = 1e8</code> internal units (like satoshis). Each lane is exactly</li>
@@ -332,23 +241,22 @@ li{margin:.25em 0}
 <ul>
 <li><strong>Supply control.</strong> <code>SUPPLY_FLOOR = 1,000,000,000</code> tokens and `SUPPLY_CAP =</li>
 </ul>
-<p>  2,000,000,000`. Below the floor there is <strong>no burn</strong> (&quot;give the network away&quot;   bootstrap). Between floor and cap a per-play <strong>listener burn</strong> scales   *cubically* — roughly: 1.0 B supply ⇒ 0 burned, 1.5 B ⇒ ~125, 1.8 B ⇒ ~512 — so   usage gets deflationary pressure as the chain approaches the cap, and minting   refuses past it.</p>
+<p>  2,000,000,000`. Below the floor there is <strong>no burn</strong> (&quot;give the network away&quot;   bootstrap). Between floor and cap a per-play <strong>listener burn</strong> scales   <em>cubically</em> — roughly: 1.0 B supply ⇒ 0 burned, 1.5 B ⇒ ~125, 1.8 B ⇒ ~512 — so   usage gets deflationary pressure as the chain approaches the cap, and minting   refuses past it.</p>
 <ul>
-<li><strong>The mini-node lane is per-stream, not per-byte.</strong> Earlier the relay earned a</li>
+<li><strong>The mini-node lane is per-stream, not per-byte.</strong></li>
 </ul>
-<p>  byte-metered <code>RelayRewardTx</code>; that is retired in favor of a flat 1-token-per-play   credit. (The old transaction type is kept only so historical blocks still replay.)</p>
 <hr/>
 <h2>11. Wallets, transfers, and non-custodial escrow</h2>
-<p><strong>In plain terms.</strong> Your wallet is a key on your device. Sending tokens is a message *you* sign — the network never moves your money without your signature, and the nodes never hold your private key. Artists&#x27; pending earnings sit in <strong>escrow held by the blockchain itself</strong>, not by any operator&#x27;s wallet.</p>
+<p><strong>In plain terms.</strong> Your wallet is a key on your device. Sending tokens is a message <em>you</em> sign — the network never moves your money without your signature, and the nodes never hold your private key. Artists&#x27; pending earnings sit in <strong>escrow held by the blockchain itself</strong>, not by any operator&#x27;s wallet.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li><strong>Transfers</strong> are <code>TransferTx{from, to, amount, nonce, from_pubkey, signature}</code>.</li>
 </ul>
-<p>  The signer covers <code>chain_id | from | to | amount | nonce | from_pubkey</code> with   secp256k1; the chain verifies the signature, cross-checks   <code>address_from_pubkey == from</code>, enforces a per-sender <strong>nonce</strong> (replay   protection), and checks balance. The private key never leaves the device; a node   only *validates and relays* a signed transaction (the <code>eth_sendRawTransaction</code>   model). <code>MC_CHAIN_ID = 19779</code> is mixed into the signature so it can&#x27;t replay on   another chain.</p>
+<p>  The signer covers <code>chain_id | from | to | amount | nonce | from_pubkey</code> with   secp256k1; the chain verifies the signature, cross-checks   <code>address_from_pubkey == from</code>, enforces a per-sender <strong>nonce</strong> (replay   protection), and checks balance. The private key never leaves the device; a node   only <em>validates and relays</em> a signed transaction (the <code>eth_sendRawTransaction</code>   model). <code>MC_CHAIN_ID = 19779</code> is mixed into the signature so it can&#x27;t replay on   another chain.</p>
 <ul>
 <li><strong>Escrow is non-custodial.</strong> A pre-threshold artist reward is minted to a</li>
 </ul>
-<p>  <strong>deterministic <code>escrow_address(artist)</code></strong> — funds the *chain* holds, not an   operator. Release is a <code>RELEASE_ESCROW</code> proposal approved by a <strong>moderator quorum</strong>   (majority vote), and it can only pay out <strong>to the artist the escrow was created   for</strong>. No single party custodies the funds; a signer <strong>cannot divert them to   themselves</strong>. The trusted part is *identity verification* (is this really the   artist), not *custody* — a narrower role than holding a pot of money.</p>
+<p>  <strong>deterministic <code>escrow_address(artist)</code></strong> — funds the <em>chain</em> holds, not an   operator. Release is a <code>RELEASE_ESCROW</code> proposal approved by a <strong>moderator quorum</strong>   (majority vote), and it can only pay out <strong>to the artist the escrow was created   for</strong>. No single party custodies the funds; a signer <strong>cannot divert them to   themselves</strong>. The trusted part is <em>identity verification</em> (is this really the   artist), not <em>custody</em> — a narrower role than holding a pot of money.</p>
 <hr/>
 <h2>12. Security model</h2>
 <table><thead><tr><th>Surface</th><th>Mechanism</th></tr></thead><tbody>
@@ -362,7 +270,7 @@ li{margin:.25em 0}
 </tbody></table>
 <hr/>
 <h2>13. Governance &amp; moderation</h2>
-<p><strong>In plain terms.</strong> A small, accountable set of moderators handles the things a public vote *can&#x27;t* safely do — verifying an artist&#x27;s identity to release escrow, and acting on takedown (DMCA) requests. New moderators must be *vouched for*, because a flood of fake moderators approving fake identity claims would be an attack.</p>
+<p><strong>In plain terms.</strong> A small, accountable set of moderators handles the things a public vote <em>can&#x27;t</em> safely do — verifying an artist&#x27;s identity to release escrow, and acting on takedown (DMCA) requests. New moderators must be <em>vouched for</em>, because a flood of fake moderators approving fake identity claims would be an attack.</p>
 <p><strong>Under the hood.</strong></p>
 <ul>
 <li>A three-tier role model on-chain: <code>FOUNDER</code> (bootstrap authority, can grant/revoke</li>
@@ -377,24 +285,6 @@ li{margin:.25em 0}
 </ul>
 <p>  base, intended to widen its operator and moderator set as the network grows.</p>
 <hr/>
-<h2>14. Scaling — what the bandwidth actually costs</h2>
-<p>Because every audio byte is <strong>relayed</strong> (<code>seeder → mini-node → listener</code>), each active stream costs a mini-node <strong>2× the flow rate</strong> — once on ingress, once on egress.</p>
-<pre><code>   one active stream at the 4 Mbit/s cap  =  4 in + 4 out  =  8 Mbit/s on the relay</code></pre>
-<ul>
-<li><strong>Measured baseline:</strong> one capped stream ≈ 4 Mbit/s in + 4 Mbit/s out ≈ 8 Mbit/s.</li>
-<li><strong>Capacity (≈1 Gbit/s relay NIC):</strong> ~<strong>125 concurrent capped streams</strong> before</li>
-</ul>
-<p>  saturation. Steady *playback* (song bitrate ~256 kbit/s, not the 4 Mbit/s burst)   is ~0.5 Mbit/s/stream — so <strong>~2,000 steady streamers</strong> fit on one relay.</p>
-<ul>
-<li><strong>For 200 users:</strong> one ~1 Gbit mini-node comfortably serves steady streaming</li>
-</ul>
-<p>  (~100 Mbit/s peak); the only stress is many *concurrent downloads* bursting at the   cap. The fix is horizontal: players load-balance across a <strong>mesh of mini-nodes</strong> —   budget roughly <strong>one 1 Gbit relay per ~125 concurrent capped flows</strong>, far more for   steady streaming.</p>
-<ul>
-<li>The real recurring cost is <strong>metered data</strong>, not peak Mbit/s: roughly *2× song</li>
-</ul>
-<p>  size per play* (in + out). At ~8 MB/song, 200 active users at 20 plays/day ≈   <strong>~1.9 TB/month</strong>; at 50 plays/day ≈ <strong>~4.8 TB/month</strong>.</p>
-<p>CPU and memory are not the constraint at these scales — bandwidth is.</p>
-<hr/>
 <h2>15. Decentralization posture</h2>
 <p>Bopwire is <strong>decentralized where it can be and centralized only where a public process would be unsafe</strong> — and it keeps those layers separate on purpose:</p>
 <ul>
@@ -402,13 +292,11 @@ li{margin:.25em 0}
 </ul>
 <p>  SwarmIndex), value transfer (self-signed transactions), and token issuance (fixed,   algorithmic, minted by genuine plays — no pre-mine, no sale, no protocol fee to any   central party).</p>
 <ul>
-<li><strong>Centralized by necessity:</strong> identity verification and escrow *release*, and</li>
+<li><strong>Centralized by necessity:</strong> identity verification and escrow <em>release</em>, and</li>
 </ul>
-<p>  content takedown. These can&#x27;t be a public vote without becoming an attack surface   (fake-identity approval, or a mob withholding an artist&#x27;s money). This is an   <strong>authorization</strong> role — the chain holds the funds; moderators only *attest* and   *can&#x27;t divert* — not a custodial one.</p>
+<p>  content takedown. These can&#x27;t be a public vote without becoming an attack surface   (fake-identity approval, or a mob withholding an artist&#x27;s money). This is an   <strong>authorization</strong> role — the chain holds the funds; moderators only <em>attest</em> and   <em>can&#x27;t divert</em> — not a custodial one.</p>
 <ul>
 <li><strong>Stewardship:</strong> development and root authority currently rest with a founder</li>
 </ul>
-<p>  operating as a node on the *same terms as any operator* (no special token reward,   no fee, no allocation). The intended trajectory is the Linux model — a steward atop   a widening, independent base of node operators and moderators, with issuance   immutable underneath.</p>
-<p>The design goal is a network whose <strong>value is created by its participants and recorded on a ledger no one privately owns</strong>, with the unavoidable trust (identity, takedown) confined to a narrow, accountable, non-custodial role.</p>
-<hr/>
-<p>*This document describes the system as implemented across the <code>bopwire</code> (C++ node/chain), <code>librats</code> (P2P transport), and <code>bopwire_player</code> (cross-platform client) components. It is a technical specification, not an offer, solicitation, or financial instrument.*</p></main></body></html>
+<p>  operating as a node on the <em>same terms as any operator</em> (no special token reward,   no fee, no allocation).</p>
+<p>The design goal is a network whose <strong>value is created by its participants and recorded on a ledger no one privately owns</strong>, with the unavoidable trust (identity, takedown) confined to a narrow, accountable, non-custodial role.</p></main></body></html>

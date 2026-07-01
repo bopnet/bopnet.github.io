@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 396" font-family="-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif" role="img" aria-label="Multi-source swarm: three seeders serving piece ranges through a relay to one downloader, verified against a manifest">
+  <defs><marker id="s" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L7,3 L0,6 Z" fill="#15b07e"/></marker></defs>
+  <style>
+    .hdr{fill:#0a7d5a;font-weight:700;font-size:14px}
+    .sub{fill:#5b6670;font-size:11.5px}
+    .li{fill:#28323a;font-size:12px}
+    .arw{stroke:#15b07e;stroke-width:2}
+    .cap{fill:#0a7d5a;font-size:10.5px;font-weight:600}
+    .chip{fill:#eef7f3;stroke:#cfe7dd}
+    .mono{font-family:Consolas,monospace;font-size:11px;fill:#0a7d5a}
+  </style>
+
+  <!-- manifest strip -->
+  <rect x="34" y="14" width="712" height="52" rx="10" fill="#f7fbf9" stroke="#cfe7dd"/>
+  <text x="48" y="34" class="sub">manifest — signed list of per-piece SHA-256 (from the full node)</text>
+  <text x="48" y="56" class="mono">piece0:ab12…   piece1:9f04…   piece2:7c55…   piece3:1de0…   …   pieceK:e3a1…</text>
+
+  <!-- seeders -->
+  <rect x="34" y="96" width="176" height="52" rx="11" fill="#fff" stroke="#c9d6d0"/><text x="122" y="118" text-anchor="middle" class="hdr">SEEDER 1</text><text x="122" y="137" text-anchor="middle" class="sub">pieces 0–7</text>
+  <rect x="34" y="170" width="176" height="52" rx="11" fill="#fff" stroke="#c9d6d0"/><text x="122" y="192" text-anchor="middle" class="hdr">SEEDER 2</text><text x="122" y="211" text-anchor="middle" class="sub">pieces 8–15</text>
+  <rect x="34" y="244" width="176" height="52" rx="11" fill="#fff" stroke="#c9d6d0"/><text x="122" y="266" text-anchor="middle" class="hdr">SEEDER 3</text><text x="122" y="285" text-anchor="middle" class="sub">pieces 16–23</text>
+
+  <!-- arrows to relay -->
+  <line x1="210" y1="122" x2="330" y2="184" class="arw" marker-end="url(#s)"/>
+  <line x1="210" y1="196" x2="330" y2="192" class="arw" marker-end="url(#s)"/>
+  <line x1="210" y1="270" x2="330" y2="200" class="arw" marker-end="url(#s)"/>
+  <text x="238" y="150" class="cap">≤4 Mbit/s each</text>
+
+  <!-- relay -->
+  <rect x="332" y="166" width="92" height="52" rx="11" fill="#eef7f3" stroke="#bfe0d3"/><text x="378" y="190" text-anchor="middle" class="hdr">relay</text><text x="378" y="207" text-anchor="middle" class="sub">mini-node</text>
+
+  <!-- relay to downloader -->
+  <line x1="424" y1="192" x2="506" y2="192" class="arw" marker-end="url(#s)"/>
+
+  <!-- downloader -->
+  <rect x="508" y="120" width="238" height="150" rx="13" fill="#fff" stroke="#c9d6d0" stroke-width="1.5"/>
+  <text x="627" y="148" text-anchor="middle" class="hdr">DOWNLOADER</text>
+  <text x="528" y="176" class="li">•  reassembles pieces in order</text>
+  <text x="528" y="200" class="li">•  SHA-256-checks each piece</text>
+  <text x="528" y="224" class="li">•  refetch bad piece elsewhere</text>
+  <text x="528" y="248" class="li">•  endgame: dup the last pieces</text>
+
+  <!-- aggregate -->
+  <text x="390" y="330" text-anchor="middle" class="cap" font-size="12.5">aggregate throughput  ≈  N × 4 Mbit/s   (scales with swarm size)</text>
+</svg>
